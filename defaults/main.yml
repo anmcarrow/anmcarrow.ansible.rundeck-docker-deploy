@@ -9,8 +9,8 @@
       - rundeck
       - ansible
 
-    volumes_prefix_rundeck: "{{ installation_prefix }}/rundeck"
-    volumes_prefix_ansible: "{{ installation_prefix }}/ansible"
+    volumes_prefix_rundeck: "{{ installation_prefix }}/docker/rundeck"
+    volumes_prefix_ansible: "{{ installation_prefix }}/docker/ansible"
 
     rundeck_bind_ip: "0.0.0.0"
     rundeck_http_port: "4440"
