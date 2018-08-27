@@ -2,8 +2,7 @@
 
 - name: Test Rundeck ports
   wait_for:
-    port:
-      - 4440
+    port: 4440
     host: "{{ ansible_default_ipv4.address }}"
     timeout: 120
     msg: "Check Rundeck ports"
