@@ -1,0 +1,2 @@
+    - import_tasks: containers-deploy.yml
+    - import_tasks: service-tests.yml

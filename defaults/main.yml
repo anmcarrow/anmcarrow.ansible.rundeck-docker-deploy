@@ -1,0 +1,17 @@
+---
+    mail_smarthost: "localhost"
+
+    admin_mail: ""
+
+    project_basedir: "/opt"
+
+    volumed_services:
+      - rundeck
+      - ansible
+
+    volumes_prefix_rundeck: "{{ project_basedir }}/rundeck"
+    volumes_prefix_ansible: "{{ project_basedir }}/ansible"
+
+    rundeck_bind_ip: "0.0.0.0"
+    rundeck_http_port: "4440"
+    rundeck_http_host: "http://{{ ansible_ssh_host }}:{{ rundeck_http_port }}"

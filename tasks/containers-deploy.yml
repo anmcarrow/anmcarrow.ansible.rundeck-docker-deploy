@@ -1,0 +1,27 @@
+---
+
+- name: "Run the local Rundeck container"
+  docker_container:
+    name: rundeck
+    hostname: "{{ ansible_hostname }}"
+    state: started
+    pull: yes
+    restart: yes
+    recreate: yes
+    restart_policy: "unless-stopped"
+    image: "anmcarrow/rundeck-ansible"
+    volumes:
+      - "{{ volumes_prefix_rundeck }}:/opt/rundeck/server"
+      - "{{ volumes_prefix_rundeck }}:/opt/rundeck/projects"
+      - "{{ volumes_prefix_ansible }}:/opt/ansible"
+    network_mode: host
+    exposed_ports:
+      - "{{ rundeck_http_port }}"
+    published_ports:
+      - "{{ rundeck_http_port }}:{{ rundeck_http_port }}"
+    env:
+      RDECK_ADMIN_PASS: "admin"
+      RDECK_HOST: "{{ rundeck_bind_ip }}"
+      RDECK_PORT: "{{ rundeck_http_port }}"
+      RDECK_URL: "{{ rundeck_http_host }}"
+  tags: rundeck,run
