@@ -6,6 +6,8 @@
     path: "{{ item }}"
   with_items:
     - "{{ volumes_prefix_rundeck }}"
+    - "{{ volumes_prefix_rundeck }}/server"
+    - "{{ volumes_prefix_rundeck }}/projects"
     - "{{ volumes_prefix_ansible }}"
     - "{{ volumes_prefix_nginx }}"
     - "{{ volumes_prefix_nginx }}/conf"
@@ -14,7 +16,7 @@
 - name: "Run the local Rundeck container"
   docker_container:
     name: rundeck
-    hostname: "{{ ansible_hostname }}"
+    hostname: "rundeck"
     state: started
     pull: yes
     restart: yes
@@ -22,8 +24,8 @@
     restart_policy: "unless-stopped"
     image: "anmcarrow/rundeck-ansible"
     volumes:
-      - "{{ volumes_prefix_rundeck }}:/opt/rundeck/server"
-      - "{{ volumes_prefix_rundeck }}:/opt/rundeck/projects"
+      - "{{ volumes_prefix_rundeck }}/server:/opt/rundeck/server"
+      - "{{ volumes_prefix_rundeck }}/projects:/opt/rundeck/projects"
       - "{{ volumes_prefix_ansible }}:/opt/ansible"
     exposed_ports:
       - "{{ rundeck_http_port }}"
