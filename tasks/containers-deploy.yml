@@ -1,5 +1,16 @@
 ---
 
+- name: Create all required directories
+  file:
+    state: directory
+    path: "{{ item }}"
+  with_items:
+    - "{{ volumes_prefix_rundeck }}"
+    - "{{ volumes_prefix_ansible }}"
+    - "{{ volumes_prefix_nginx }}"
+    - "{{ volumes_prefix_nginx }}/conf"
+    - "{{ volumes_prefix_nginx }}/ssl"
+
 - name: "Run the local Rundeck container"
   docker_container:
     name: rundeck
@@ -14,14 +25,63 @@
       - "{{ volumes_prefix_rundeck }}:/opt/rundeck/server"
       - "{{ volumes_prefix_rundeck }}:/opt/rundeck/projects"
       - "{{ volumes_prefix_ansible }}:/opt/ansible"
-    network_mode: host
     exposed_ports:
       - "{{ rundeck_http_port }}"
-    published_ports:
-      - "{{ rundeck_http_port }}:{{ rundeck_http_port }}"
+#     published_ports:
+#      - "{{ rundeck_http_port }}:{{ rundeck_http_port }}"
     env:
       RDECK_ADMIN_PASS: "admin"
-      RDECK_HOST: "{{ rundeck_bind_ip }}"
-      RDECK_PORT: "{{ rundeck_http_port }}"
-      RDECK_URL: "{{ rundeck_http_host }}"
+#      RDECK_HOST: "{{ rundeck_bind_ip }}"
+#      RDECK_PORT: "{{ rundeck_http_port }}"
+#      RDECK_URL: "{{ rundeck_http_host }}"
   tags: rundeck,run
+
+- name: Install required Pip packages
+  pip:
+    name: pyOpenSSL
+    state: present
+  tags: rundeck,python,ssl
+
+- name: Deploy CSR and keyfile on the target host(s)
+  copy:
+    src: "{{ item }}"
+    dest: "{{ volumes_prefix_nginx }}/ssl/{{ item }}"
+  with_items:
+    - rundeck.example.csr
+    - rundeck.example.key
+  tags: rundeck,nginx,ssl
+
+- name: Generate a Self Signed OpenSSL certificate for NginX
+  openssl_certificate:
+    path: "{{ volumes_prefix_nginx }}/ssl/rundeck.example.crt"
+    privatekey_path: "{{ volumes_prefix_nginx }}/ssl/rundeck.example.key"
+    csr_path: "{{ volumes_prefix_nginx }}/ssl/rundeck.example.csr"
+    provider: selfsigned
+
+- name: Deploy NginX virtualhost template for Rundeck reverse-proxying
+  template:
+    src: rundeck-nginx.conf.j2
+    dest: "{{ volumes_prefix_nginx }}/conf/rundeck-nginx.conf"
+  tags: rundeck,nginx,ssl
+
+- name: "Run the local Nginx container"
+  docker_container:
+    name: rundeck-nginx
+    hostname: "{{ ansible_hostname }}"
+    state: started
+    pull: yes
+    restart: yes
+    recreate: yes
+    restart_policy: "unless-stopped"
+    image: "nginx:alpine"
+    volumes:
+      - "{{ volumes_prefix_nginx }}/conf:/etc/nginx/conf.d"
+      - "{{ volumes_prefix_nginx }}/ssl:/etc/nginx/ssl"
+    links: rundeck
+    exposed_ports:
+      - "{{ nginx_http_port }}"
+      - "{{ nginx_https_port }}"
+    published_ports:
+      - "{{ nginx_http_port }}:{{ nginx_http_port }}"
+      - "{{ nginx_https_port }}:{{ nginx_https_port }}"
+  tags: rundeck,nginx,run

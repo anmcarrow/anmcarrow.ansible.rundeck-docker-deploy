@@ -1,9 +1,12 @@
 ---
 
-- name: Test Rundeck ports
+- name: Test NginX ports
   wait_for:
-    port: 4440
+    port: "{{ item }}"
     host: "{{ ansible_default_ipv4.address }}"
     timeout: 120
-    msg: "Check Rundeck ports"
-  tags: rundeck,test
+    msg: "Check Nginx ports"
+  with_items:
+    - "{{ nginx_http_port }}"
+    - "{{ nginx_https_port }}"
+  tags: rundeck,nginx,test
