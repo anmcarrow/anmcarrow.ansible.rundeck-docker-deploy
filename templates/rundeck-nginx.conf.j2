@@ -14,6 +14,7 @@ location / {
     proxy_pass http://rundeck:4440;
 
     sub_filter "http://rundeck:4440/" "http://$host/";
+    sub_filter "http://0.0.0.0:4440/" "http://$host/";
     sub_filter_once off;
 
     proxy_redirect    http://0.0.0.0:4440/    http://$http_host/;
