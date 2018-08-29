@@ -26,7 +26,7 @@
     volumes:
       - "{{ volumes_prefix_rundeck }}/server:/opt/rundeck/server"
       - "{{ volumes_prefix_rundeck }}/projects:/opt/rundeck/projects"
-      - "{{ volumes_prefix_ansible }}:/opt/ansible"
+      - "{{ volumes_prefix_ansible }}:{{ volumes_prefix_ansible }}"
     exposed_ports:
       - "{{ rundeck_http_port }}"
 #     published_ports:
