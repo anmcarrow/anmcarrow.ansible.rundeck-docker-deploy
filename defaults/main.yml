@@ -13,6 +13,8 @@
     volumes_prefix_ansible: "{{ installation_prefix }}/docker/ansible"
     volumes_prefix_nginx: "{{ installation_prefix }}/docker/nginx"
 
+    ansible_rsa_keys_path: "{{ volumes_prefix_ansible }}/keys"
+
     rundeck_bind_ip: "0.0.0.0"
     rundeck_http_port: "4440"
     rundeck_http_host: "http://{{ ansible_ssh_host }}:{{ rundeck_http_port }}"

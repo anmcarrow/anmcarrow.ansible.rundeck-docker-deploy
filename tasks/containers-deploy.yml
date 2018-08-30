@@ -33,6 +33,7 @@
 #      - "{{ rundeck_http_port }}:{{ rundeck_http_port }}"
     env:
       RDECK_ADMIN_PASS: "admin"
+      RSA_KEYS_PATH: "{{ ansible_rsa_keys_path }}"
 #      RDECK_HOST: "{{ rundeck_bind_ip }}"
 #      RDECK_PORT: "{{ rundeck_http_port }}"
 #      RDECK_URL: "{{ rundeck_http_host }}"
